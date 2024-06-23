@@ -69,9 +69,9 @@ Switch to the [`flatnet-gen`](https://github.com/siddiquesalman/flatnet/tree/fla
 
 ### Data, PSFs and Checkpoint
 
-* Download data as [imagenet_caps_384_12bit_Feb_19](https://drive.google.com/open?id=1TTiQbIX_a880slUk4US32wovfqhsIYpd&authuser=ee16b068%40smail.iitm.ac.in&usp=drive_fs) and place under `data` (or symlink it).
-* Download Point Spread Function(s) and Mask(s) as [phase_psf](https://drive.google.com/open?id=1BbotgTN4I2kGanWV130dLWwxalODo-FG&authuser=ee16b068%40smail.iitm.ac.in&usp=drive_fs) and place under `data` (or symlink it).
-* Download checkpoints from [ckpts_phase_mask_Feb_2020_size_384](https://drive.google.com/open?id=159MsGGakny59MSXuynHMYSWiaq73o4af&authuser=ee16b068%40smail.iitm.ac.in&usp=drive_fs) and place as `ckpts_phase_mask_Feb_2020_size_384`.
+* Download data as [imagenet_caps_384_12bit_Feb_19](https://www.dropbox.com/scl/fo/zgocrrr2kgcmsaoh6fjy0/ADG91fY02g7jOs1Zgik60bE?rlkey=6rlqhya1x6g950lp9hn96tz34&e=1&st=0itteru4&dl=0) and uncompress it under `data/imagenet_caps_384_12bit_Feb_19` (or symlink it).
+* Download Point Spread Function(s) and Mask(s) as [phase_psf](https://github.com/siddiquesalman/flatnet/blob/flatnet-gen/data/phase_psf/psf.npy) and place under `data` (or symlink it).
+* Download checkpoints from [ckpts_phase_mask_Feb_2020_size_384](https://www.dropbox.com/scl/fo/8f75ws9rgx0bwswh8y5er/AMyVfNbT9H0KvEZh3d0nbVU?rlkey=fgralgr3gy8kegsrxxbmugbkx&e=1&st=ytnus60y&dl=0) and place as `ckpts_phase_mask_Feb_2020_size_384`.
 
 You should then have the following directory structure:
 
@@ -79,10 +79,10 @@ You should then have the following directory structure:
 .
 |-- ckpts_phase_mask_Feb_2020_size_384
 |   |-- ours-fft-1280-1408-learn-1280-1408-meas-1280-1408
-|   `-- le-admm-fft-1280-1408-learn-1280-1408-meas-1280-1408
+|
 |-- data
 |   |-- imagenet_caps_384_12bit_Feb_19
-|   `-- phase_psf
+|   |-- phase_psf
 ```
 
 ### Streamlit Server
