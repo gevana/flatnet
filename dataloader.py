@@ -36,13 +36,19 @@ def demosaic_raw(meas):
 
 class DatasetFromFilenames:
 
-	def __init__(self, filenames_loc_meas, filenames_loc_orig):
+	def __init__(self, 
+				filenames_loc_meas, 
+				filenames_loc_orig, 
+				data_root_meas, 
+				data_root_orig
+				):
 		self.filenames_meas = filenames_loc_meas
-		self.paths_meas = get_paths(self.filenames_meas)
+		self.paths_meas = get_paths(self.filenames_meas, data_root_meas)
 		self.filenames_orig = filenames_loc_orig
-		self.paths_orig = get_paths(self.filenames_orig)
+		self.paths_orig = get_paths(self.filenames_orig, data_root_orig)
 		self.num_im = len(self.paths_meas)
 		self.totensor = torchvision.transforms.ToTensor()
+		self.to_numpy = torchvision.transforms.ToPILImage()
 		self.resize = torchvision.transforms.Resize((256,256))
 		
 
@@ -73,11 +79,11 @@ class DatasetFromFilenames:
 		return meas,im
 
 
-def get_paths(fname):
+def get_paths(fname, data_root):
 	paths = []
 	with open(fname, 'r') as f:
 		for line in f:
-			temp = '/media/data/salman/'+str(line).strip()
+			temp = data_root + str(line).strip()
 			paths.append(temp)
 	return paths
 

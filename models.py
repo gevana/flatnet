@@ -145,10 +145,14 @@ class FlatNet(nn.Module):
 		self.bn=nn.BatchNorm2d(n_channels,momentum=0.99)
 	def forward(self, Xinp):
 		
-		X0=F.leaky_relu(torch.matmul(torch.matmul(Xinp[:,0,:,:],self.PhiR[:,:,0]).permute(0,2,1),self.PhiL[:,:,0]).permute(0,2,1).unsqueeze(3))
-		X11=F.leaky_relu(torch.matmul(torch.matmul(Xinp[:,1,:,:],self.PhiR[:,:,0]).permute(0,2,1),self.PhiL[:,:,0]).permute(0,2,1).unsqueeze(3))
-		X12=F.leaky_relu(torch.matmul(torch.matmul(Xinp[:,2,:,:],self.PhiR[:,:,0]).permute(0,2,1),self.PhiL[:,:,0]).permute(0,2,1).unsqueeze(3))
-		X2=F.leaky_relu(torch.matmul(torch.matmul(Xinp[:,3,:,:],self.PhiR[:,:,0]).permute(0,2,1),self.PhiL[:,:,0]).permute(0,2,1).unsqueeze(3))
+		X0=F.leaky_relu(torch.matmul(torch.matmul(Xinp[:,0,:,:],self.PhiR[:,:,0]).permute(0,2,1),
+												self.PhiL[:,:,0]).permute(0,2,1).unsqueeze(3))
+		X11=F.leaky_relu(torch.matmul(torch.matmul(Xinp[:,1,:,:],self.PhiR[:,:,0]).permute(0,2,1),
+												self.PhiL[:,:,0]).permute(0,2,1).unsqueeze(3))
+		X12=F.leaky_relu(torch.matmul(torch.matmul(Xinp[:,2,:,:],self.PhiR[:,:,0]).permute(0,2,1),
+												self.PhiL[:,:,0]).permute(0,2,1).unsqueeze(3))
+		X2=F.leaky_relu(torch.matmul(torch.matmul(Xinp[:,3,:,:],self.PhiR[:,:,0]).permute(0,2,1),
+												self.PhiL[:,:,0]).permute(0,2,1).unsqueeze(3))
 		Xout=torch.cat((X2,X12,X11,X0),3)
 		x = Xout.permute(0,3,1,2)
 
