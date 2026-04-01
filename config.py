@@ -24,13 +24,13 @@ def base_config():
     output_dir = Path("output_phase_mask_Feb_2020_size_384") / exp_name
     ckpt_dir = Path("ckpts_phase_mask_Feb_2020_size_384") / exp_name
     run_dir = Path("runs_phase_mask_Feb_2020_size_384") / exp_name  # Tensorboard
-    test_image_dir = image_dir / "PhaseCapture_Webcam" / "saves"
+    test_image_dir = Path(image_dir) / "PhaseCapture_Webcam" / "saves"
 
     # ---------------------------------------------------------------------------- #
     # Data
     # ---------------------------------------------------------------------------- #
 
-    text_file_dir = image_dir / "text_files"
+    text_file_dir = Path(image_dir) / "text_files"
     train_source_list = text_file_dir / "train_source_imagenet_384_384_Feb_19.txt"
     train_target_list = text_file_dir / "train_target.txt"
 
@@ -278,7 +278,7 @@ def ours_meas_1280_1408_finetune_dualcam_1cap():
     static_val_image = "multicap_28.png"
     static_test_image = "test_set_Jan/output_cap_Image__2020-01-16__22-56-05.raw.png"
     image_dir = Path("data")
-    text_file_dir = image_dir / "text_files"
+    text_file_dir = Path(image_dir) / "text_files"
     train_source_list = text_file_dir / "train_meas_1cap_indoor_dualcam.txt"
     train_target_list = text_file_dir / "train_webcam_indoor_dualcam.txt"
     val_source_list = text_file_dir / "val_meas_3cap_indoor_dualcam.txt"
@@ -309,7 +309,7 @@ def ours_meas_608_864_finetune_dualcam_1cap():
     static_val_image = "multicap_28.png"
     static_test_image = "test_set_Jan/output_cap_Image__2020-01-16__22-56-05.raw.png"
     image_dir = Path("data")
-    text_file_dir = image_dir / "text_files"
+    text_file_dir = Path(image_dir) / "text_files"
     train_source_list = text_file_dir / "train_meas_1cap_indoor_dualcam.txt"
     train_target_list = text_file_dir / "train_webcam_indoor_dualcam.txt"
     val_source_list = text_file_dir / "val_meas_3cap_indoor_dualcam.txt"
@@ -344,7 +344,7 @@ def ours_meas_990_1254_finetune_dualcam_1cap():
     static_val_image = "multicap_28.png"
     static_test_image = "test_set_Jan/output_cap_Image__2020-01-16__22-56-05.raw.png"
     image_dir = Path("data")
-    text_file_dir = image_dir / "text_files"
+    text_file_dir = Path(image_dir) / "text_files"
     train_source_list = text_file_dir / "train_meas_1cap_indoor_dualcam.txt"
     train_target_list = text_file_dir / "train_webcam_indoor_dualcam.txt"
     val_source_list = text_file_dir / "val_meas_3cap_indoor_dualcam.txt"

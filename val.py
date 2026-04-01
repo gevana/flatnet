@@ -8,6 +8,7 @@ from collections import defaultdict
 import numpy as np
 import logging
 import cv2
+from pathlib import Path
 
 # Torch Libs
 import torch
@@ -56,6 +57,8 @@ def config():
 @ex.automain
 def main(_run):
     args = tupperware(_run.config)
+    args.image_dir = Path(args.image_dir)
+    args.ckpt_dir = Path(args.ckpt_dir)
     args.batch_size = 1
 
     # Set device, init dirs
@@ -76,7 +79,8 @@ def main(_run):
 
     # LPIPS Criterion
     lpips_criterion = PerceptualLoss(
-        model="net-lin", net="alex", use_gpu=True, gpu_ids=[device]
+        model="net-lin", net="alex", use_gpu=False if device == "cpu" else True,
+        gpu_ids=[device]
     ).to(device)
 
     # Load Models
@@ -186,7 +190,7 @@ def main(_run):
                 )
 
                 metrics_dict["SSIM"] += ssim(
-                    target_numpy, output_numpy, multichannel=True, data_range=1.0
+                    target_numpy, output_numpy,channel_axis=-1, data_range=1.0
                 )
 
                 # Dump to output folder
@@ -198,10 +202,10 @@ def main(_run):
                 path_fft = path / (f"{interm_name}_" + name)
 
                 cv2.imwrite(
-                    str(path_output), (output_numpy[:, :, ::-1] * 255.0).astype(np.int)
+                    str(path_output), (output_numpy[:, :, ::-1] * 255.0).astype(np.uint8)
                 )
                 cv2.imwrite(
-                    str(path_fft), (fft_output_vis[:, :, ::-1] * 255.0).astype(np.int)
+                    str(path_fft), (fft_output_vis[:, :, ::-1] * 255.0).astype(np.uint8)
                 )
 
             metrics_dict["SSIM"] = metrics_dict["SSIM"] / args.batch_size

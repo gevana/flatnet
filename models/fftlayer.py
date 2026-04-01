@@ -16,28 +16,66 @@ ex = Experiment("FFT-Layer")
 ex = initialise(ex)
 
 
+# def fft_conv2d(input, kernel):
+#     """
+#     Computes the convolution in the frequency domain given
+#     Expects input and kernel already in frequency domain!
+#     :param input: shape (B, Cin, H, W)
+#     :param kernel: shape (Cout, Cin, H, W)
+#     :param bias: shape of (B, Cout, H, W)
+#     :return:
+#     """
+#     input = torch.rfft(input, 2, onesided=False)
+#     kernel = torch.rfft(kernel, 2, onesided=False)
+
+#     # Compute the multiplication
+#     # (a+bj)*(c+dj) = (ac-bd)+(ad+bc)j
+#     real = input[..., 0] * kernel[..., 0] - input[..., 1] * kernel[..., 1]
+#     im = input[..., 0] * kernel[..., 1] + input[..., 1] * kernel[..., 0]
+
+#     # Stack both channels and sum-reduce the input channels dimension
+#     out = torch.stack([real, im], -1)
+
+#     out = torch.irfft(out, 2, onesided=False)
+#     return out
+
+
+
 def fft_conv2d(input, kernel):
     """
-    Computes the convolution in the frequency domain given
-    Expects input and kernel already in frequency domain!
+    Computes 2D convolution in the frequency domain.
+    Expects input and kernel in the spatial domain!
+    
     :param input: shape (B, Cin, H, W)
     :param kernel: shape (Cout, Cin, H, W)
-    :param bias: shape of (B, Cout, H, W)
-    :return:
+    :return: Convolution result of shape (B, Cout, H, W)
     """
-    input = torch.rfft(input, 2, onesided=False)
-    kernel = torch.rfft(kernel, 2, onesided=False)
+    assert kernel.shape[0] == 1, (
+        f"Expected kernel to have 1 output channel (Cout=1), "
+        f"but got {kernel.shape[0]} instead."
+    )
 
-    # Compute the multiplication
-    # (a+bj)*(c+dj) = (ac-bd)+(ad+bc)j
-    real = input[..., 0] * kernel[..., 0] - input[..., 1] * kernel[..., 1]
-    im = input[..., 0] * kernel[..., 1] + input[..., 1] * kernel[..., 0]
 
-    # Stack both channels and sum-reduce the input channels dimension
-    out = torch.stack([real, im], -1)
+    # 1. Transform both to frequency domain (returns complex tensors)
+    input_fft = torch.fft.fft2(input)
+    kernel_fft = torch.fft.fft2(kernel)
 
-    out = torch.irfft(out, 2, onesided=False)
+    # 2. Complex multiplication (PyTorch handles the real/imaginary math automatically!)
+    # We use unsqueeze to align dimensions for broadcasting:
+    # input_fft:  (B,    1, Cin, H, W)
+    # kernel_fft: (1, Cout, Cin, H, W)
+    out_fft = input_fft.unsqueeze(1) * kernel_fft.unsqueeze(0)
+
+    
+    # 4. Transform back to spatial domain and keep the real part
+    out = torch.fft.ifft2(out_fft).real
+
+    # At this point, shape is (B, 1, Cin, H, W)
+    # We squeeze dimension 1 to remove the Cout=1 dimension
+    out = out.squeeze(1)
+    
     return out
+
 
 
 def get_wiener_matrix(psf, Gamma: int = 20000, centre_roll: bool = True):
@@ -55,15 +93,25 @@ def get_wiener_matrix(psf, Gamma: int = 20000, centre_roll: bool = True):
 
     psf = psf.unsqueeze(0)
 
-    H = torch.rfft(psf, 2, onesided=False)
-    Habsq = H[:, :, :, 0].pow(2) + H[:, :, :, 1].pow(2)
+    # H = torch.rfft(psf, 2, onesided=False)
+    #Habsq = H[:, :, :, 0].pow(2) + H[:, :, :, 1].pow(2)
+    #W_0 = (torch.div(H[:, :, :, 0], (Habsq + Gamma))).unsqueeze(-1)
+    #W_1 = (-torch.div(H[:, :, :, 1], (Habsq + Gamma))).unsqueeze(-1)
+    #W = torch.cat((W_0, W_1), -1)
+    #weiner_mat = torch.irfft(W, 2, onesided=False)
+    #return weiner_mat[0]
 
-    W_0 = (torch.div(H[:, :, :, 0], (Habsq + Gamma))).unsqueeze(-1)
-    W_1 = (-torch.div(H[:, :, :, 1], (Habsq + Gamma))).unsqueeze(-1)
-    W = torch.cat((W_0, W_1), -1)
+    H = torch.fft.fft2(psf)
 
-    weiner_mat = torch.irfft(W, 2, onesided=False)
+    # 2. Calculate squared magnitude (|H|^2)
+    Habsq = H.abs().pow(2)
 
+    # 3. Compute the complex Wiener Filter: H* / (|H|^2 + Gamma)
+    # H.conj() gives the complex conjugate, matching the negative sign in the original W_1
+    W = H.conj() / (Habsq + Gamma)
+
+    # 4. Compute the complex 2D Inverse FFT and take the real part
+    weiner_mat = torch.fft.ifft2(W).real
     return weiner_mat[0]
 
 

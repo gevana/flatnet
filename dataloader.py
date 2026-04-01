@@ -97,9 +97,34 @@ class PhaseMaskDataset(Dataset):
         self.max_len = max_len
 
         self.source_paths, self.target_paths = self._load_dataset()
-
+        logging.info(f'dataset = {self.mode} Before: {len(self.source_paths)=}')
+        self.source_paths, self.target_paths = self._check_all_paths_exists(self.source_paths,self.target_paths)
+        logging.info(f'dataset = {self.mode} After: {len(self.source_paths)=}')
+        
         if is_local_rank_0:
             logging.info(f"{mode.capitalize()} Set | Image Dir: {self.image_dir}")
+
+    def _check_all_paths_exists(self,source_paths,target_paths):
+        missing_ind = []
+        if self.mode == "test" :
+            for idx,spath in enumerate(source_paths):
+                if not spath.exists():
+                    #logging.warning(f"Source path {spath} does not exist")
+                    missing_ind.append(idx)
+            ind_to_keep = [idx for idx in range(len(source_paths)) if idx not in missing_ind]
+            source_paths = [source_paths[i] for i in ind_to_keep]
+            return source_paths, target_paths
+        for idx,(spath,tpath) in enumerate(zip(source_paths,target_paths)):
+            if not spath.exists() or not tpath.exists():
+                #logging.warning(f"Source path {spath} does not exist")
+                # remove the pair    
+                missing_ind.append(idx)
+                continue
+        
+        ind_to_keep = [idx for idx in range(len(source_paths)) if idx not in missing_ind]
+        source_paths = [source_paths[i] for i in ind_to_keep]
+        target_paths = [target_paths[i] for i in ind_to_keep]
+        return source_paths, target_paths    
 
     def _glob_images(self, file_list):
         with open(file_list) as f:

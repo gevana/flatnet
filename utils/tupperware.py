@@ -2,6 +2,11 @@ from collections import UserDict
 import collections
 from recordclass import recordclass
 
+# If Mapping isn't in collections, grab it from collections.abc
+if not hasattr(collections, 'Mapping'):
+    import collections.abc
+    collections.Mapping = collections.abc.Mapping
+
 __author__ = 'github.com/hangtwenty'
 
 
