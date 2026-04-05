@@ -8,6 +8,7 @@ from collections import defaultdict
 import logging
 import numpy as np
 import os, sys, warnings
+from pathlib import Path
 
 # Torch Libs
 import torch
@@ -62,7 +63,7 @@ torch.autograd.set_detect_anomaly(True)
 @ex.automain
 def main(_run):
     args = tupperware(_run.config)
-
+    args.image_dir = Path(args.image_dir)
     # Dir init
     dir_init(args, is_local_rank_0=is_local_rank_0)
 

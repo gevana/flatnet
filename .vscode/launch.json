@@ -25,6 +25,20 @@
                 "ours_meas_1280_1408",
                 "-p"
             ]
+        },
+        {
+            "name": "train phat",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "train.py",
+            "console": "integratedTerminal",
+            "args": [
+                "with",
+                "image_dir=/mnt/c/dev/lensless/phlatcam/imagenet/",
+                //"ckpt_dir=/mnt/c/dev/lensless/phlatcam/flatnet-gen-ckpts/ckpts_phase_mask_Feb_2020_size_384/ours-fft-1280-1408-learn-1280-1408-meas-1280-1408/",
+                "ours_meas_1280_1408",
+                "-p"
+            ]
         }
     ]
 }
