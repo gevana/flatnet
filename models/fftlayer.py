@@ -146,7 +146,7 @@ class FFTLayer(nn.Module):
             mask = torch.tensor(np.load(args.mask_path)).float()
             self.mask = nn.Parameter(mask, requires_grad=False)
 
-    def forward(self, img):
+    def _forward(self, img):
         pad_x = self.args.psf_height - self.args.psf_crop_size_x
         pad_y = self.args.psf_width - self.args.psf_crop_size_y
 
@@ -183,14 +183,39 @@ class FFTLayer(nn.Module):
         img = fft_conv2d(img, self.fft_layer) * self.normalizer
 
         # Centre Crop
+        # img = img[
+        #     :,
+        #     :,
+        #     fft_h // 2 - img_h // 2 : fft_h // 2 + img_h // 2,
+        #     fft_w // 2 - img_w // 2 : fft_w // 2 + img_w // 2,
+        # ]
+        return img
+
+    def forward(self, img):
+        img =  self._forward(img)
+        # FFT Layer dims
+        _, _, fft_h, fft_w = self.fft_layer.shape
+
+        # Target image (eg: 384) dims
+        img_h = self.args.image_height
+        img_w = self.args.image_width
+        
+        #Centre Crop
         img = img[
             :,
             :,
             fft_h // 2 - img_h // 2 : fft_h // 2 + img_h // 2,
             fft_w // 2 - img_w // 2 : fft_w // 2 + img_w // 2,
         ]
+        
         return img
 
+class FFTLayer_debug(FFTLayer):
+    def __init__(self, args: "tupperware"):
+        super().__init__(args)
+    
+    def forward(self, img):
+        return super().forward(img)
 
 @ex.automain
 def main(_run):
